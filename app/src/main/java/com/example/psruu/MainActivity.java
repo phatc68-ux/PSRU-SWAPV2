@@ -235,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (currentDialog.getWindow() != null) {
             currentDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            // คำนวณความกว้างหน้าต่างโพสต์ให้เหมาะสม (92% ของหน้าจอ)
             int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92);
             currentDialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -478,6 +479,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (detailDialog.getWindow() != null) {
             detailDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            // คำนวณความกว้างหน้าต่างรายละเอียดสินค้าให้พอดี (92% ของหน้าจอ)
             int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.92);
             detailDialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
@@ -508,6 +510,15 @@ public class MainActivity extends AppCompatActivity {
         if (tvDetailFacebook != null) tvDetailFacebook.setText("Facebook: " + product.getSellerFacebook());
         if (tvDetailInstagram != null) tvDetailInstagram.setText("Instagram: " + product.getSellerInstagram());
         if (tvDetailPhone != null) tvDetailPhone.setText("โทร: " + product.getSellerPhone());
+
+        // =========================================================================
+        // 🟢 [แก้ไขตรงนี้]: กำหนดให้พื้นหลังรอบรูปภาพเป็น "สีขาว" และแสดงภาพครบถ้วน 100%
+        // =========================================================================
+        if (ivDetailProduct != null) {
+            ivDetailProduct.setBackgroundColor(Color.WHITE); // เปลี่ยนพื้นหลังส่วนเกินรอบรูปให้เป็นสีขาว (แก้ปัญหารูปมีแถบสีดำด้านข้าง)
+            ivDetailProduct.setScaleType(ImageView.ScaleType.FIT_CENTER); // จัดรูปให้อยู่กึ่งกลางและแสดงครบถ้วนโดยไม่ถูกตัดขอบ
+            ivDetailProduct.setAdjustViewBounds(true); // ปรับขอบเขตกรอบให้อัตโนมัติตามสัดส่วนจริงของรูปภาพ
+        }
 
         if (ivDetailProduct != null && product.getImageUri() != null && !product.getImageUri().isEmpty()) {
             try {
@@ -559,12 +570,19 @@ public class MainActivity extends AppCompatActivity {
                     String favJson = prefs.getString("favorite_list", "[]");
                     org.json.JSONArray jsonArray = new org.json.JSONArray(favJson);
                     org.json.JSONObject newObj = new org.json.JSONObject();
+
+                    // ข้อมูลสินค้าเดิม
                     newObj.put("name", product.getName());
                     newObj.put("price", product.getPrice());
                     newObj.put("category", product.getCategory());
                     newObj.put("image", product.getImageUri());
                     newObj.put("detail", product.getDetail());
                     newObj.put("location", product.getLocation());
+                    newObj.put("postType", product.getPostType());
+
+                    // เพิ่มข้อมูลผู้ขายชุดนี้เข้าไปด้วย เพื่อให้ FavoriteRepository อ่านค่าได้ถูกต้อง
+                    newObj.put("sellerName", product.getSellerName());
+
                     jsonArray.put(newObj);
                     prefs.edit().putString("favorite_list", jsonArray.toString()).apply();
                     Toast.makeText(MainActivity.this, "บันทึกเข้ารายการโปรดแล้ว ❤️", Toast.LENGTH_SHORT).show();
@@ -584,6 +602,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (ratingDialog.getWindow() != null) {
             ratingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            // คำนวณความกว้างหน้าต่างให้คะแนนให้เหมาะสม (85% ของหน้าจอ)
             int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.85);
             ratingDialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
         }
