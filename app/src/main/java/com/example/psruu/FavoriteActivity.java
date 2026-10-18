@@ -138,13 +138,15 @@ public class FavoriteActivity extends AppCompatActivity {
 
     private ImageView createProductImageView(String imageUriStr) {
         ImageView ivProduct = new ImageView(this);
+
+        // 🟢 แก้ไข: เติมเครื่องหมาย * ให้ถูกต้องสมบูรณ์
         int imgSizePx = (int) (80 * getResources().getDisplayMetrics().density);
+
         LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(imgSizePx, imgSizePx);
         ivProduct.setLayoutParams(imgParams);
         ivProduct.setScaleType(ImageView.ScaleType.CENTER_CROP);
         ivProduct.setBackgroundColor(Color.parseColor("#CED4DA"));
 
-        // แก้ไขให้รองรับการถอดรหัส Base64 String ให้แสดงรูปภาพได้อย่างถูกต้อง
         if (imageUriStr != null && !imageUriStr.isEmpty()) {
             try {
                 byte[] decodedString = Base64.decode(imageUriStr, Base64.DEFAULT);
@@ -186,9 +188,31 @@ public class FavoriteActivity extends AppCompatActivity {
         tvPrice.setTextSize(13);
         tvPrice.setTypeface(null, android.graphics.Typeface.BOLD);
 
+        // ดึงคะแนนรีวิวจริงจาก UserRepository
+        UserRepository userRepository = new UserRepository(this);
+        float realRating = userRepository.getAverageRating();
+        String ratingText = (realRating > 0) ? String.format(java.util.Locale.getDefault(), "%.1f", realRating) : "5.0";
+
+        // ดึงชื่อผู้ขายจริงจาก Product Object
+        String sellerName = (product.getSellerName() != null && !product.getSellerName().isEmpty())
+                ? product.getSellerName() : "ผู้ขาย";
+
+        TextView tvSellerAndRating = new TextView(this);
+        tvSellerAndRating.setText("👤 " + sellerName + "  |  ⭐ " + ratingText);
+        tvSellerAndRating.setTextColor(Color.parseColor("#6C757D"));
+        tvSellerAndRating.setTextSize(11);
+
+        LinearLayout.LayoutParams sellerParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        sellerParams.setMargins(0, 4, 0, 0);
+        tvSellerAndRating.setLayoutParams(sellerParams);
+
         infoLayout.addView(tvCategory);
         infoLayout.addView(tvName);
         infoLayout.addView(tvPrice);
+        infoLayout.addView(tvSellerAndRating);
 
         return infoLayout;
     }
